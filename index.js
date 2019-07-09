@@ -2,26 +2,29 @@ if(process.env.NODE_ENV !== 'production') require('dotenv').config();
 const express = require('express');
 const app = express();
 
-var api_key = process.env.API_KEY;
-var domain = process.env.MY_DOMAIN;
-var mail = process.env.MY_MAIL;
-var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+const bodyParser = require('body-parser');
+app.use(bodyParser);
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+const api_key = process.env.API_KEY;
+const DOMAIN = process.env.MY_DOMAIN;
+const mail = process.env.MY_MAIL;
+const mailgun = require('mailgun-js');
+const mg = mailgun({apiKey: api_key, domain: DOMAIN});
 
-app.post('https://portfoliobe.herokuapp.com/', function(req, res) {
-    res.send('POST request');
+app.post('/sendEmail', function(req, res) {
+  console.log(req.body.name);
+  res.send('POST');
+})
+
+const data = {
+	from: 'Excited User <me@samples.mailgun.org>',
+	to: 'mel.test9@gmail.com',
+	subject: 'Hello',
+	text: 'Testing some Mailgun awesomness!'
+};
+
+const sendEmail = mg.messages().send(data, function (error, body) {
+  if(!error) console.log(body);
+  else console.error('Error: ', error);
 });
-
-// var data = {
-//   from: 'Excited User <me@samples.mailgun.org>',
-//   to: 'mel.test9@gmail.com',
-//   subject: 'Hello',
-//   text: 'Testing some Mailgun awesomeness!'
-// };
-
-// mailgun.messages().send(data, function (err, body) {
-//   if(!error) {
-//       console.log(body);
-//   } else {
-//       console.log(err);
-//   }
-// });
